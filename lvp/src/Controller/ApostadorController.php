@@ -3,11 +3,10 @@
 
 namespace App\Controller;
 
-use App\Repository\ApostadorRepository;
+use App\Service\Apuesta;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Repository\ApuestaRepository;
 
 /**
  * Class ApostadorController
@@ -21,8 +20,8 @@ class ApostadorController extends AbstractController    {
      * @Route("/ganador/{numeroGanador}")
      */
 
-    public function getGanador(ApuestaRepository $apuestaRepository, int $numeroGanador) {
-        $ganador = $apuestaRepository->getApuestaMasCercana($numeroGanador)->getApostador();
+    public function getGanador(Apuesta $apuesta, int $numeroGanador) {
+        $ganador = $apuesta->getGanador($numeroGanador);
         return $this->json($ganador);
     }
 }

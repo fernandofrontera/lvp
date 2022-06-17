@@ -39,7 +39,7 @@ class Apostador
      * @ORM\Column(type="string", length=255)
      * @Groups({"apuesta"})
      * @Assert\Regex(
-     *     pattern = "/^[a-zA-Z]+ ?[a-zA-Z]*$/",
+     *     pattern = "/^[a-zA-ZáéíóúÁÉÍÓÚüÜ ]+$/",
      *     message = "Ingrese un nombre válido"
      * )
      */

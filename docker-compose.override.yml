@@ -10,13 +10,11 @@ services:
       DB_USER: lvp
       DB_PASSWORD: lvp
       DB_PORT: 3306
-      REMOTE_IP: 192.168.42.91
-      REMOTE_PORT: 9003
-      IDE_KEY: lvp
     ports:
       - "80:80"
     volumes:
       - ./lvp/src:/var/www/html/lvp/src
+      - ./lvp/tests:/var/www/html/lvp/tests
 
   db:
     image: mysql

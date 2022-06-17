@@ -7,6 +7,7 @@ namespace App\Service;
 use App\Entity\Apostador;
 use App\Entity\Apuesta as ApuestaEntity;
 use App\Exception\InvalidException;
+use App\Repository\ApuestaRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -70,6 +71,11 @@ class Apuesta {
             throw $e;
         }
         return $apuesta;
+    }
+
+    public function getGanador(int $killsFinales) {
+        $apuestaMasCercana = $this->em->getRepository(ApuestaEntity::class)->getApuestaMasCercana($killsFinales);
+        return $apuestaMasCercana->getApostador();
     }
 
 }

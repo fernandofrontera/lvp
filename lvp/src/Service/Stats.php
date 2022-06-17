@@ -19,14 +19,14 @@ class Stats
     }
 
     public function getMayorKills() {
-        return $this->getKillsFirstApuestaOrderBy("DESC");
+        return $this->getFirstApuestaKillsOrderedBy("DESC");
     }
 
     public function getMenorKills() {
-        return $this->getKillsFirstApuestaOrderBy("ASC");
+        return $this->getFirstApuestaKillsOrderedBy("ASC");
     }
 
-    private function getKillsFirstApuestaOrderBy($order) {
+    private function getFirstApuestaKillsOrderedBy($order) {
         return $this->apuestaRepository->findOneBy([], ["kills" => $order])->getKills();
     }
 
