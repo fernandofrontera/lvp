@@ -1,0 +1,7 @@
+version: '3'
+
+services:
+  lvp:
+    image: lvp
+    build:
+      context: .

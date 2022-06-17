@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  lvp:
+    container_name: lvp
+    depends_on: [db]
+    environment:
+      DB_HOST: db
+      DB_NAME: lvp
+      DB_USER: lvp
+      DB_PASSWORD: lvp
+      DB_PORT: 3306
+      REMOTE_IP: 192.168.42.91
+      REMOTE_PORT: 9003
+      IDE_KEY: lvp
+    ports:
+      - "80:80"
+    volumes:
+      - ./lvp/src:/var/www/html/lvp/src
+
+  db:
+    image: mysql
+    environment:
+      MYSQL_DATABASE: lvp
+      MYSQL_USER: lvp
+      MYSQL_PASSWORD: lvp
+      MYSQL_ROOT_PASSWORD: lvp
+    ports:
+      - "3306:3306"
