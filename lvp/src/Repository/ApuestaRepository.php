@@ -48,15 +48,13 @@ class ApuestaRepository extends ServiceEntityRepository
     }
 
     public function getApuestaMasCercana(int $valor): ?Apuesta {
-        $apuestaMasCercana = $this->createQueryBuilder('a')
-            ->select("a, ABS(a.kills - {$valor}) AS HIDDEN distancia")
+        return $this->createQueryBuilder("a")
+            ->addSelect("g, ABS(a.kills - {$valor}) AS HIDDEN distancia")
+            ->join("a.apostador", "g")
             ->orderBy("distancia", "ASC")
             ->getQuery()
             ->getResult()[0]
         ;
-        $this->getEntityManager()->refresh($apuestaMasCercana);
-
-        return $apuestaMasCercana;
     }
 
 //    /**

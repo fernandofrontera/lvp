@@ -39,19 +39,6 @@ class ApostadorRepository extends ServiceEntityRepository
         }
     }
 
-    public function getGanador($killsTotales) {
-        $apuestaMasCercana = $this->createQueryBuilder('a')
-            ->select("a, ABS(ap.kills - {$killsTotales}) AS HIDDEN diferencia")
-            ->join("Apuesta", "a")
-            ->orderBy("diferencia", "ASC")
-            ->getQuery()
-            ->getResult()[0]
-        ;
-        $this->getEntityManager()->refresh($apuestaMasCercana);
-
-        return $apuestaMasCercana;
-    }
-
 //    /**
 //     * @return Apostador[] Returns an array of Apostador objects
 //     */

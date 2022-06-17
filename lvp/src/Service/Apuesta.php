@@ -20,7 +20,6 @@ class Apuesta {
     }
 
     /**
-     * @param ValidatorInterface $validator
      * @param array $data
      * @return ApuestaEntity
      * @throws InvalidException
@@ -44,9 +43,21 @@ class Apuesta {
         else return $apuesta;
     }
 
+    /**
+     * @param array $data
+     * @param string[] $camposEsperados
+     * @return bool
+     */
+
     private function faltanCampos(array $data, array $camposEsperados) {
         return $camposEsperados !== array_keys($data);
     }
+
+    /**
+     * @param ApuestaEntity $apuesta
+     * @return ApuestaEntity
+     * @throws \Exception
+     */
 
     public function save(ApuestaEntity $apuesta) {
         $this->em->beginTransaction();
