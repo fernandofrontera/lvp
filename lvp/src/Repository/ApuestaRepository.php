@@ -21,12 +21,22 @@ class ApuestaRepository extends ServiceEntityRepository
         parent::__construct($registry, Apuesta::class);
     }
 
-    public function add(Apuesta $entity, bool $flush = false): void
+    public function add(Apuesta $entity, bool $flush = false): Apuesta
     {
-        $this->getEntityManager()->persist($entity);
+        $em = $this->getEntityManager();
+        $em->beginTransaction();
 
-        if ($flush) {
-            $this->getEntityManager()->flush();
+        try {
+            $em->persist($entity);
+
+            if ($flush) {
+                $em->flush();
+            }
+            $em->commit();
+            return $entity;
+        } catch(\Exception $e) {
+            $em->rollback();
+            throw $e;
         }
     }
 

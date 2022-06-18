@@ -14,6 +14,7 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
+use Doctrine\DBAL\Exception\DriverException;
 
 /**
  * Class ApuestaController
@@ -31,8 +32,8 @@ class ApuestaController extends AbstractController {
 
         $data = $request->toArray();
         try {
-            $apuesta = $srvcApuesta->createApuesta($data);
-            $srvcApuesta->save($apuesta);
+            $apuesta = $srvcApuesta->crearApuesta($data);
+            $srvcApuesta->guardar($apuesta);
             $content = $apuesta->getId();
             $status = Response::HTTP_OK;
         } catch(InvalidException $exception) {
@@ -63,8 +64,12 @@ class ApuestaController extends AbstractController {
                 AbstractObjectNormalizer::ENABLE_MAX_DEPTH => true
             ]);
             $status = Response::HTTP_OK;
+        } catch(DriverException $e) {
+            $content = "Hubo un error con la base de datos. ¿Es posible que no haya realizado la migración?";
+            $status = Response::HTTP_INTERNAL_SERVER_ERROR;
         } catch(\Exception $e) {
-            var_dump($e->getMessage());die;
+            $content = "Hubo un error al intentar obtener las apuestas.";
+            $status = Response::HTTP_INTERNAL_SERVER_ERROR;
         }
         return $this->json($content, $status);
     }
@@ -83,19 +88,10 @@ class ApuestaController extends AbstractController {
             ];
             $status = Response::HTTP_OK;
         } catch(\Exception $e) {
-
+            $content = "Hubo un error al consultar las estadísticas.";
+            $status = Response::HTTP_INTERNAL_SERVER_ERROR;
         }
 
         return $this->json($content, $status);
     }
-
-    /**
-     * @Route("/ganador")
-     */
-
-    public function ganador(ApuestaRepository $apuestaRepository) {
-        $ganador = $apuestaRepository->getApuestaMasCercana(6);
-        $this->json($ganador->getApostador()->getId());
-    }
-
 }

@@ -13,10 +13,11 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class Apuesta {
 
-    private $em, $validator;
+    private $validator;
+    private ApuestaRepository $apuestaRepository;
 
-    public function __construct(ValidatorInterface $validator, EntityManagerInterface $em) {
-        $this->em = $em;
+    public function __construct(ValidatorInterface $validator, ApuestaRepository $apuestaRepository) {
+        $this->apuestaRepository = $apuestaRepository;
         $this->validator = $validator;
     }
 
@@ -25,7 +26,7 @@ class Apuesta {
      * @return ApuestaEntity
      * @throws InvalidException
      */
-    public function createApuesta($data) {
+    public function crearApuesta($data) {
         $camposEsperados = ["email", "nombre", "kills"];
 
         if($this->faltanCampos($data, $camposEsperados)) {
@@ -50,8 +51,10 @@ class Apuesta {
      * @return bool
      */
 
-    private function faltanCampos(array $data, array $camposEsperados) {
-        return $camposEsperados !== array_keys($data);
+    public function faltanCampos(array $data, array $camposEsperados) {
+        return !empty(
+            array_diff($camposEsperados, array_keys($data))
+        );
     }
 
     /**
@@ -60,21 +63,18 @@ class Apuesta {
      * @throws \Exception
      */
 
-    public function save(ApuestaEntity $apuesta) {
-        $this->em->beginTransaction();
+    public function guardar(ApuestaEntity $apuesta) {
         try {
-            $this->em->persist($apuesta);
-            $this->em->flush();
-            $this->em->commit();
+            $this->apuestaRepository->add($apuesta, true);
+            return $apuesta;
         } catch(\Exception $e) {
-            $this->em->rollback();
             throw $e;
+            return null;
         }
-        return $apuesta;
     }
 
     public function getGanador(int $killsFinales) {
-        $apuestaMasCercana = $this->em->getRepository(ApuestaEntity::class)->getApuestaMasCercana($killsFinales);
+        $apuestaMasCercana = $this->apuestaRepository->getApuestaMasCercana($killsFinales);
         return $apuestaMasCercana->getApostador();
     }
 

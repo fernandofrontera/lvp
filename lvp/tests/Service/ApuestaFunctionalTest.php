@@ -1,54 +1,23 @@
 <?php
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use App\Service\Apuesta;
-use App\Repository\ApuestaRepository;
-use App\Entity\Apostador;
-use App\Entity\Apuesta as ApuestaEntity;
-use App\Exception\InvalidException;
+namespace App\Tests\Service;
 
-class ApuestaTest extends WebTestCase
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use App\Repository\ApuestaRepository;
+use App\Exception\InvalidException;
+use App\Service\Apuesta;
+
+class ApuestaFunctionalTest extends WebTestCase
 {
-    /**
-     * @var Apuesta $srvcApuesta
-     * @var ApuestaRepository $apuestaRepository
-     */
-    private $srvcApuesta, $apuestaRepository;
+    private ApuestaRepository $apuestaRepository;
+    private static Apuesta $srvcApuesta;
 
     protected function setUp(): void {
-        $this->srvcApuesta = static::getContainer()->get(Apuesta::class);
         $this->apuestaRepository = static::getContainer()->get(ApuestaRepository::class);
+        self::$srvcApuesta = static::getContainer()->get(Apuesta::class);
     }
 
-    /**
-     * @dataProvider apuestasValidasProvider
-     * @param $data
-     * @throws InvalidException
-     */
-
-    public function testCrearApuesta($data): ApuestaEntity {
-        $apuesta = $this->srvcApuesta->createApuesta($data);
-
-        $this->assertSame($data["email"], $apuesta->getApostador()->getEmail());
-        $this->assertSame($data["nombre"], $apuesta->getApostador()->getNombre());
-        $this->assertSame($data["kills"], $apuesta->getKills());
-
-        return $apuesta;
-    }
-
-    /**
-     * @dataProvider apuestasInvalidasProvider
-     * @param $data
-     * @param $exceptionEsperada
-     * @throws InvalidException
-     */
-
-    public function testCrearApuestaInvalida($data, $exceptionEsperada) {
-        $this->expectException($exceptionEsperada);
-        $this->srvcApuesta->createApuesta($data);
-    }
-
-    public function apuestasValidasProvider(): array {
+    public static function apuestasValidasProvider(): array {
         return [
             [
                 [
@@ -72,6 +41,16 @@ class ApuestaTest extends WebTestCase
                 ]
             ]
         ];
+    }
+
+    public static function apuestasProvider(): array {
+        $data = array_merge(...self::apuestasValidasProvider());
+
+        return array_map(function($dataApuesta) {
+            self::$srvcApuesta->guardar(
+                self::$srvcApuesta->crearApuesta($dataApuesta)
+            );
+        }, $data);
     }
 
     public function apuestasInvalidasProvider(): array {
@@ -105,9 +84,37 @@ class ApuestaTest extends WebTestCase
                     "nombre" => "Nombre válido",
                     "kills" => "boom"
                 ],
-                TypeError::class
+                \TypeError::class
             ]
         ];
+    }
+
+    /**
+     * @dataProvider apuestasValidasProvider
+     * @param $data
+     * @throws InvalidException
+     */
+
+    public function testCrearApuesta($data) {
+        $apuesta = self::$srvcApuesta->crearApuesta($data);
+
+        $this->assertSame($data["email"], $apuesta->getApostador()->getEmail());
+        $this->assertSame($data["nombre"], $apuesta->getApostador()->getNombre());
+        $this->assertSame($data["kills"], $apuesta->getKills());
+
+        return 3;
+    }
+
+    /**
+     * @dataProvider apuestasInvalidasProvider
+     * @param $data
+     * @param $exceptionEsperada
+     * @throws InvalidException
+     */
+
+    public function testCrearApuestaInvalida($data, $exceptionEsperada) {
+        $this->expectException($exceptionEsperada);
+        self::$srvcApuesta->crearApuesta($data);
     }
 
     /**
@@ -115,11 +122,20 @@ class ApuestaTest extends WebTestCase
      */
 
     public function testSaveApuesta($data) {
-        $apuesta = $this->srvcApuesta->createApuesta($data);
-        $this->srvcApuesta->save($apuesta);
+        $apuesta = self::$srvcApuesta->crearApuesta($data);
+        self::$srvcApuesta->guardar($apuesta);
 
-        $apuestaEncontrada = $this->apuestaRepository->findOneBy(["email" => $apuesta->getApostador()->getEmail()]);
+        $apuestaEncontrada = $this->apuestaRepository->find($apuesta->getId());
 
         $this->assertEquals($apuesta, $apuestaEncontrada);
+    }
+
+    public function testGanador() {
+        self::apuestasProvider();
+
+        $this->assertEquals(
+            self::$srvcApuesta->getGanador(10)->getEmail(),
+            "usuario@lvp.global"
+        );
     }
 }

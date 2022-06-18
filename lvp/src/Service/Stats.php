@@ -8,13 +8,15 @@ use App\Repository\ApuestaRepository;
 
 class Stats
 {
-    private $apuestaRepository;
+    private ApuestaRepository $apuestaRepository;
 
     public function __construct(ApuestaRepository $apuestaRepository) {
         $this->apuestaRepository = $apuestaRepository;
     }
 
     public function getTotalApuestas() {
+        // esta solución no es tan óptima como una query que sólo devuelva la cantidad de registros
+        // pero se optó por esta solución en aras de la simplicidad y entendimiento del código
         return count($this->apuestaRepository->findAll());
     }
 

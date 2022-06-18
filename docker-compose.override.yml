@@ -12,9 +12,6 @@ services:
       DB_PORT: 3306
     ports:
       - "80:80"
-    volumes:
-      - ./lvp/src:/var/www/html/lvp/src
-      - ./lvp/tests:/var/www/html/lvp/tests
 
   db:
     image: mysql
