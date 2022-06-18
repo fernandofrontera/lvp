@@ -19,3 +19,31 @@
 - Levante el contenedor: `docker-compose up -d`. La aplicación se levantará en http://localhost:80
 - Ejecute la migración de la base de datos: `docker-compose exec lvp migrate`
 - Si desea ejecutar las pruebas de la aplicación puede ejecutar el siguiente comando: `docker-compose exec lvp test`
+
+#### Referencia de la API:
+
+- **Crear apuesta:**
+  - Endpoint: `/apuestas`
+  - Method: POST
+  - Request body:
+  ```
+  {
+    "email": "fernandodf91@gmail.com",
+    "nombre": "Fernando Frontera",
+    "kills": 31
+  }
+  ```
+    
+- **Consultar apuestas:**
+  - Endpoint: `/apuestas`
+  - Method: GET
+  
+- **Ver estadísticas:**
+  - Endpoint: `/apuestas/stats`
+  - Method: GET
+
+- **Consultar ganador:**
+  - Endpoint: `/apostadores/ganador/{killsTotales}`
+  - Method: GET
+  - Query params:
+    - killsTotales: número positivo
