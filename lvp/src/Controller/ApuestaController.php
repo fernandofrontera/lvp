@@ -80,12 +80,16 @@ class ApuestaController extends AbstractController {
 
     public function stats(Stats $stats) {
         try {
-            $content = [
-                "total_apuestas" => $stats->getTotalApuestas(),
-                "kills_maxima" => $stats->getMayorKills(),
-                "kills_minima" => $stats->getMenorKills(),
-                "kills_promedio" => $stats->getKillsPromedio()
-            ];
+            $totalApuestas = $stats->getTotalApuestas();
+            $content["total_apuestas"] = $totalApuestas;
+            if($totalApuestas)
+                $content = array_merge($content,
+                    [
+                        "kills_maxima" => $stats->getMayorKills(),
+                        "kills_minima" => $stats->getMenorKills(),
+                        "kills_promedio" => $stats->getKillsPromedio()
+                    ]
+                );
             $status = Response::HTTP_OK;
         } catch(\Exception $e) {
             $content = "Hubo un error al consultar las estadísticas.";
